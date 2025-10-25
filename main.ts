@@ -410,8 +410,8 @@ export default class AnotherDynamicHighlightsPlugin extends Plugin {
     // Force re-render of all markdown views in reading mode
     this.app.workspace.iterateAllLeaves((leaf) => {
       if (
-        leaf.view instanceof MarkdownView &&
-        leaf.view.getMode() === "preview"
+        leaf.view instanceof MarkdownView 
+        //&& leaf.view.getMode() === "preview"
       ) {
         // If reading mode is disabled, we need to remove existing highlights first
         if (!this.settings.staticHighlighter.showInReadingMode) {
