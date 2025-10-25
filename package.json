@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-dynamic-hightlighter",
-	"version": "1.2.3",
+	"version": "1.2.4",
 	"description": "Another Dynamic Highlights Plugin that highlights RegEx and word under cursor.",
 	"main": "main.js",
 	"scripts": {
