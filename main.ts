@@ -408,80 +408,80 @@ export default class AnotherDynamicHighlightsPlugin extends Plugin {
 
   private registerReadingModeHighlighter() {
     // Only register if the setting is enabled
-      this.registerMarkdownPostProcessor(
-        (element: HTMLElement, context: any) => {
-          // Only process if the main switch is on AND reading mode highlights are enabled
-          if (
-            !this.settings.staticHighlighter.onOffSwitch ||
-            !this.settings.staticHighlighter.showInReadingMode
-          ) {
-            // Force re-render of all markdown views in reading mode
-            this.app.workspace.iterateAllLeaves((leaf) => {
-              if (
-                leaf.view instanceof MarkdownView
-                // && leaf.view.getMode() === "preview"
-              ) {
-                // If reading mode is disabled, we need to remove existing highlights first
-                if (!this.settings.staticHighlighter.showInReadingMode) {
-                  const container = leaf.view.previewMode.containerEl;
-                  const highlights = container.querySelectorAll(".adhl-highlighted");
-                  highlights.forEach((highlight) => {
-                    // Replace the highlight span with its text content
-                    highlight.replaceWith(highlight.textContent || "");
-                  });
-                }
-                leaf.view.previewMode.rerender(true);
+    this.registerMarkdownPostProcessor(
+      (element: HTMLElement, context: any) => {
+        // Only process if the main switch is on AND reading mode highlights are enabled
+        if (
+          !this.settings.staticHighlighter.onOffSwitch ||
+          !this.settings.staticHighlighter.showInReadingMode
+        ) {
+          // Force re-render of all markdown views in reading mode
+          this.app.workspace.iterateAllLeaves((leaf) => {
+            if (
+              leaf.view instanceof MarkdownView
+              // && leaf.view.getMode() === "preview"
+            ) {
+              // If reading mode is disabled, we need to remove existing highlights first
+              if (!this.settings.staticHighlighter.showInReadingMode) {
+                const container = leaf.view.previewMode.containerEl;
+                const highlights = container.querySelectorAll(".adhl-highlighted");
+                highlights.forEach((highlight) => {
+                  // Replace the highlight span with its text content
+                  highlight.replaceWith(highlight.textContent || "");
+                });
               }
-            });
-            return;
-          }
-
-          if (!this.settings.staticHighlighter.showInReadingMode) { 
-            return;
-          }
-
-          // Get active queries
-          const activeQueries = Object.entries(
-            this.settings.staticHighlighter.queries
-          ).filter(
-            ([_, query]) => query.highlighterEnabled && query.tagEnabled
-          );
-
-          activeQueries.forEach(([highlighterName, query]) => {
-            try {
-              let patternString = query.query;
-              let flags = "gm"; // Default flags
-
-              if (query.regex) {
-                // Check if the query string contains flags like /pattern/flags
-                const match = query.query.match(/^\/(.*)\/([gimyus]*)$/);
-                if (match) {
-                  patternString = match[1];
-                  // Combine extracted flags with default, ensuring no duplicates
-                  flags = Array.from(
-                    new Set(flags.split("").concat(match[2].split("")))
-                  ).join("");
-                }
-                // If no flags in query string, patternString remains query.query and flags remain "gm"
-              } else {
-                patternString = query.query.replace(
-                  /[-\\/\\\\^$*+?.()|[\\]{}]/g,
-                  "\\$&"
-                );
-                // For non-regex, flags remain "gm" (though 'g' is most relevant for replacement, 'm' doesn't hurt)
-              }
-
-              const pattern = new RegExp(patternString, flags);
-
-              this.processNodeForHighlights(element, pattern, query);
-            } catch (error) {
-              console.error(
-                `Error processing highlighter ${highlighterName}:`,
-                error
-              );
+              leaf.view.previewMode.rerender(true);
             }
           });
+          return;
         }
-      );
-    }
+
+        if (!this.settings.staticHighlighter.showInReadingMode) {
+          return;
+        }
+
+        // Get active queries
+        const activeQueries = Object.entries(
+          this.settings.staticHighlighter.queries
+        ).filter(
+          ([_, query]) => query.highlighterEnabled && query.tagEnabled
+        );
+
+        activeQueries.forEach(([highlighterName, query]) => {
+          try {
+            let patternString = query.query;
+            let flags = "gm"; // Default flags
+
+            if (query.regex) {
+              // Check if the query string contains flags like /pattern/flags
+              const match = query.query.match(/^\/(.*)\/([gimyus]*)$/);
+              if (match) {
+                patternString = match[1];
+                // Combine extracted flags with default, ensuring no duplicates
+                flags = Array.from(
+                  new Set(flags.split("").concat(match[2].split("")))
+                ).join("");
+              }
+              // If no flags in query string, patternString remains query.query and flags remain "gm"
+            } else {
+              patternString = query.query.replace(
+                /[-\\/\\\\^$*+?.()|[\\]{}]/g,
+                "\\$&"
+              );
+              // For non-regex, flags remain "gm" (though 'g' is most relevant for replacement, 'm' doesn't hurt)
+            }
+
+            const pattern = new RegExp(patternString, flags);
+
+            this.processNodeForHighlights(element, pattern, query);
+          } catch (error) {
+            console.error(
+              `Error processing highlighter ${highlighterName}:`,
+              error
+            );
+          }
+        });
+      }
+    );
+  }
 }
