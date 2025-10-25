@@ -80,6 +80,7 @@ export default class AnotherDynamicHighlightsPlugin extends Plugin {
 
     // Force re-render of all markdown views in reading mode
     this.app.workspace.iterateAllLeaves((leaf) => {
+      console.debug('========leaf', leaf)
       if (leaf.view instanceof MarkdownView) {
         // Check if the view is in preview mode
         if (leaf.view.getMode() === "preview" || true) {
@@ -410,6 +411,9 @@ export default class AnotherDynamicHighlightsPlugin extends Plugin {
     // Only register if the setting is enabled
     this.registerMarkdownPostProcessor(
       (element: HTMLElement, context: any) => {
+
+        console.debug('--------------register run', element);
+
         if (!this.settings.staticHighlighter.onOffSwitch ||
           !this.settings.staticHighlighter.showInReadingMode) {
           // Force re-render of all markdown views in reading mode
